@@ -15,12 +15,15 @@ body {
 }
 
 .video-wrapper {
-  max-width: 960px;   /* YouTube-szerű szélesség */
-  margin: 40px auto;
+  max-width: 960px;
+  margin: 40px auto;   /* EZ igazítja középre */
+  display: flex;
+  justify-content: center;
 }
 
 .video-container {
   position: relative;
+  width: 100%;
   padding-bottom: 56.25%;
   height: 0;
 }
@@ -40,10 +43,6 @@ body {
   color: black;
   border: none;
   cursor: pointer;
-}
-
-#continueBtn:hover {
-  background-color: #ccc;
 }
 </style>
 </head>
@@ -98,3 +97,4 @@ body {
 </body>
 
 </html>
+
