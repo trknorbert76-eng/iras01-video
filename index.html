@@ -61,37 +61,47 @@ body {
 </button>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
   var player;
+  var shown = false;
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player('mainVideo', {
       events: {
-        'onStateChange': onPlayerStateChange
+        'onReady': onPlayerReady
       }
     });
   }
 
-  function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING) {
-      var checkTime = setInterval(function() {
-        if (player.getCurrentTime() >= 146) { // 2:26
-          document.getElementById("continueBtn").style.display = "block";
-          clearInterval(checkTime);
-        }
-      }, 1000);
-    }
-  }
+  function onPlayerReady() {
+    // Stabil idő-ellenőrzés: fél másodpercenként ránézünk
+    setInterval(function () {
+      if (!player || shown) return;
 
-  document.getElementById("continueBtn").onclick = function() {
-    window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
-  };
+      var t = 0;
+      try {
+        t = player.getCurrentTime();
+      } catch (e) {
+        return; // ha az API épp nem elérhető, ne omoljon össze
+      }
+
+      if (t >= 146) { // 2:26
+        document.getElementById("continueBtn").style.display = "block";
+        shown = true;
+      }
+    }, 500);
+
+    // Gomb kattintás
+    document.getElementById("continueBtn").onclick = function () {
+      window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
+    };
+  }
 </script>
 
 </body>
 
 </html>
+
 
 
 
