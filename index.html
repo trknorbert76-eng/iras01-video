@@ -14,6 +14,11 @@ body {
   text-align: center;
 }
 
+.video-wrapper {
+  max-width: 960px;   /* YouTube-szerű szélesség */
+  margin: 40px auto;
+}
+
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -35,7 +40,6 @@ body {
   color: black;
   border: none;
   cursor: pointer;
-  transition: opacity 1s ease;
 }
 
 #continueBtn:hover {
@@ -46,14 +50,16 @@ body {
 
 <body>
 
-<div class="video-container">
-  <iframe 
-    id="mainVideo"
-    src="https://www.youtube.com/embed/PFn3w7sRm3Y?enablejsapi=1"
-    frameborder="0"
-    allow="autoplay; encrypted-media"
-    allowfullscreen>
-  </iframe>
+<div class="video-wrapper">
+  <div class="video-container">
+    <iframe 
+      id="mainVideo"
+      src="https://www.youtube.com/embed/PFn3w7sRm3Y?enablejsapi=1"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
+  </div>
 </div>
 
 <button id="continueBtn">
@@ -90,4 +96,5 @@ body {
 </script>
 
 </body>
+
 </html>
