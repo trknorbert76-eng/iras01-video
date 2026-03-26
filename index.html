@@ -75,38 +75,71 @@ body {
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-  var player;
-  var shown = false;
+const SUPABASE_URL = "https://hhysuxfwdjwlxtmlxnrv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4Btoi0wsypr48xQH31RMaQ_r1YrPpsv";
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('mainVideo', {
-      events: {
-        'onReady': onPlayerReady
-      }
+async function track(event){
+  try{
+    await fetch(SUPABASE_URL + "/rest/v1/jesus_stats", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY,
+        "Prefer":"return=minimal"
+      },
+      body: JSON.stringify({ event })
     });
+  }catch(e){}
+}
+
+// OLDAL BETÖLTÉS
+track("video_page_01");
+
+var player;
+var shown = false;
+var started = false;
+
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('mainVideo', {
+    events: {
+      'onReady': onPlayerReady
+    }
+  });
+}
+
+function onPlayerReady() {
+
+  // VIDEÓ ELINDULT (csak egyszer)
+  if (!started) {
+    track("video_start_01");
+    started = true;
   }
 
-  function onPlayerReady() {
-    setInterval(function () {
-      if (!player || shown) return;
+  setInterval(function () {
+    if (!player || shown) return;
 
-      var t = 0;
-      try {
-        t = player.getCurrentTime();
-      } catch (e) {
-        return;
-      }
+    var t = 0;
+    try {
+      t = player.getCurrentTime();
+    } catch (e) {
+      return;
+    }
 
-      if (t >= 146) { // 2:26
-        document.getElementById("continueBtn").style.display = "block";
-        shown = true;
-      }
-    }, 500);
+    // ELÉRTE A VÉGÉT
+    if (t >= 146) {
+      document.getElementById("continueBtn").style.display = "block";
+      track("video_reach_01");
+      shown = true;
+    }
+  }, 500);
 
-    document.getElementById("continueBtn").onclick = function () {
-      window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
-    };
-  }
+  // TOVÁBB GOMB
+  document.getElementById("continueBtn").onclick = function () {
+    track("continue_01");
+    window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
+  };
+}
 </script>
 
 </body>
