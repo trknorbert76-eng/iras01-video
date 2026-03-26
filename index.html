@@ -6,48 +6,74 @@
 <title>Az Írás – Hívő</title>
 
 <style>
-body {
+html, body {
   margin: 0;
-  background-color: black;
+  padding: 0;
+  background: black;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 .video-wrapper {
   max-width: 960px;
-  margin: 40px auto;
+  margin: 0 auto;
+  background: black;
 }
 
 .video-container {
   position: relative;
   width: 100%;
+  background: black;
 }
 
 video {
   width: 100%;
   height: auto;
   display: block;
+  background: black;
 }
 
+/* normál nézetben is működik */
 #continueBtn {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  top: 68%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 9999;
 
   display: none;
-  padding: 14px 28px;
+  padding: 16px 30px;
   font-size: 20px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.96);
   color: black;
   border: none;
   border-radius: 14px;
   cursor: pointer;
   box-shadow: 0 6px 24px rgba(0,0,0,0.45);
   font-weight: bold;
+  min-width: 220px;
 }
 
 #continueBtn:hover {
   background: white;
+}
+
+@media (max-width: 768px) {
+  .video-wrapper {
+    margin: 0 auto;
+  }
+
+  #continueBtn {
+    width: calc(100vw - 40px);
+    max-width: 360px;
+    font-size: 18px;
+    padding: 15px 20px;
+    bottom: 20px;
+  }
 }
 </style>
 </head>
@@ -57,16 +83,20 @@ video {
 <div class="video-wrapper">
   <div class="video-container">
 
-    <video id="mainVideo" controls playsinline>
+    <video
+      id="mainVideo"
+      controls
+      playsinline
+      webkit-playsinline
+      preload="metadata"
+    >
       <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774557619/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
     </video>
 
-    <button id="continueBtn">
-      Folytatás
-    </button>
-
   </div>
 </div>
+
+<button id="continueBtn">Folytatás</button>
 
 <script>
 const SUPABASE_URL = "https://hhysuxfwdjwlxtmlxnrv.supabase.co";
@@ -96,6 +126,42 @@ const btn = document.getElementById("continueBtn");
 let started = false;
 let reached = false;
 
+// fullscreen kilépés többféle böngészőre
+function exitAnyFullscreen() {
+  try {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  } catch(e) {}
+
+  try {
+    if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  } catch(e) {}
+
+  try {
+    if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) {
+      video.webkitExitFullscreen();
+    }
+  } catch(e) {}
+
+  try {
+    if (document.msFullscreenElement && document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  } catch(e) {}
+}
+
+function showContinue() {
+  btn.style.display = "block";
+
+  // kis késleltetés után odagörget, hogy biztos látható legyen
+  setTimeout(() => {
+    btn.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 250);
+}
+
 // VIDEÓ INDÍTÁS
 video.addEventListener("play", () => {
   if (!started) {
@@ -107,10 +173,27 @@ video.addEventListener("play", () => {
 // ELÉRTE A 2:26-OT (146 mp)
 video.addEventListener("timeupdate", () => {
   if (!reached && video.currentTime >= 146) {
-    btn.style.display = "block";
-    track("video_reach_01");
     reached = true;
+    track("video_reach_01");
+
+    // kilép fullscreenből
+    exitAnyFullscreen();
+
+    // megállítjuk a videót, hogy a néző biztos észrevegye a folytatást
+    setTimeout(() => {
+      video.pause();
+      showContinue();
+    }, 300);
   }
+});
+
+// ha valamiért fullscreen állapotváltás közben jut el ide
+document.addEventListener("fullscreenchange", () => {
+  if (reached) showContinue();
+});
+
+document.addEventListener("webkitfullscreenchange", () => {
+  if (reached) showContinue();
 });
 
 // TOVÁBB GOMB
