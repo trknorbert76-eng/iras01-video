@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Jézusos statisztika</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#111;
+  color:#fff;
+  padding:40px;
+}
+
+h1{
+  margin-bottom:30px;
+}
+
+h2{
+  margin-top:40px;
+  color:#ffd700;
+}
+
+table{
+  border-collapse:collapse;
+  width:500px;
+  margin-top:10px;
+}
+
+td,th{
+  border:1px solid #444;
+  padding:10px;
+}
+
+th{
+  background:#222;
+}
+
+tr:nth-child(even){
+  background:#1a1a1a;
+}
+</style>
+</head>
+<body>
+
+<h1>Jézusos statisztika</h1>
+
+<div id="content"></div>
+
+<script>
+const SUPABASE_URL = "https://hhysuxfwdjwlxtmlxnrv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4Btoi0wsypr48xQH31RMaQ_r1YrPpsv";
+
+async function loadStats(){
+
+const res = await fetch(
+  SUPABASE_URL + "/rest/v1/jesus_stats?select=event",
+  {
+    headers:{
+      apikey:SUPABASE_KEY,
+      Authorization:"Bearer " + SUPABASE_KEY
+    }
+  }
+);
+
+const data = await res.json();
+
+// számlálás
+const counts = {};
+data.forEach(row=>{
+  counts[row.event] = (counts[row.event] || 0) + 1;
+});
+
+// segéd függvény
+function val(e){
+  return counts[e] || 0;
+}
+
+// HTML építés
+let html = "";
+
+// 1️⃣ TESZT
+html += `
+<h2>1. Teszt</h2>
+<table>
+<tr><td>Oldal megnyitás</td><td>${val("video_page_01")}</td></tr>
+<tr><td>Videó indítás</td><td>${val("video_start_01")}</td></tr>
+<tr><td>Folytatás gomb</td><td>${val("continue_01")}</td></tr>
+</table>
+`;
+
+// 2️⃣ EREDMÉNY
+html += `
+<h2>2. Eredmény</h2>
+<table>
+<tr><td>Jobb oldalra jutott</td><td>${val("result_right")}</td></tr>
+<tr><td>Bal oldalra jutott</td><td>${val("result_left")}</td></tr>
+</table>
+`;
+
+// 3️⃣ JOBB OLDAL
+html += `
+<h2>3. Jobb oldali befejezés</h2>
+<table>
+<tr><td>Oldal megnyitás</td><td>${val("video_page_right")}</td></tr>
+<tr><td>Videó indítás</td><td>${val("video_start_right")}</td></tr>
+<tr><td>Szövegig eljutott</td><td>${val("video_text_right")}</td></tr>
+<tr><td>Végképig eljutott</td><td>${val("video_endimage_right")}</td></tr>
+<tr><td>Videó végéig jutott</td><td>${val("video_finish_right")}</td></tr>
+</table>
+`;
+
+// 4️⃣ BAL OLDAL
+html += `
+<h2>4. Bal oldali befejezés</h2>
+<table>
+<tr><td>Oldal megnyitás</td><td>${val("video_page_left")}</td></tr>
+<tr><td>Videó indítás</td><td>${val("video_start_left")}</td></tr>
+<tr><td>Szövegig eljutott</td><td>${val("video_text_left")}</td></tr>
+<tr><td>Végképig eljutott</td><td>${val("video_endimage_left")}</td></tr>
+<tr><td>Videó végéig jutott</td><td>${val("video_finish_left")}</td></tr>
+</table>
+`;
+
+document.getElementById("content").innerHTML = html;
+
+}
+
+loadStats();
+</script>
+
+</body>
+</html>
