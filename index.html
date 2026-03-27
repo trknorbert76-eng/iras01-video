@@ -167,6 +167,10 @@ function showContinue() {
   }, 250);
 }
 
+function hideContinue() {
+  btn.style.display = "none";
+}
+
 async function startEndAudioOnce() {
   if (endAudioStarted) return;
   endAudioStarted = true;
@@ -184,6 +188,13 @@ function stopEndAudio() {
     bgAudio.pause();
     bgAudio.currentTime = 0;
   } catch(e) {}
+}
+
+function resetAfterBackwardSeek() {
+  stopEndAudio();
+  hideContinue();
+  reached = false;
+  endAudioStarted = false;
 }
 
 // VIDEÓ INDÍTÁS
@@ -210,8 +221,20 @@ video.addEventListener("timeupdate", async () => {
   }
 });
 
-// ha bele teker és egyből ide ugrik
+// ha elkezd visszatekerni 2:26 elé
+video.addEventListener("seeking", () => {
+  if (video.currentTime < 146 && endAudioStarted) {
+    resetAfterBackwardSeek();
+  }
+});
+
+// ha előre vagy hátra tekerés után megáll
 video.addEventListener("seeked", async () => {
+  if (video.currentTime < 146) {
+    resetAfterBackwardSeek();
+    return;
+  }
+
   if (!reached && video.currentTime >= 146) {
     reached = true;
     track("video_reach_01");
