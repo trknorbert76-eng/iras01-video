@@ -90,7 +90,7 @@ video {
       webkit-playsinline
       preload="metadata"
     >
-      <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774609678/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
+     <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774611443/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
     </video>
 
   </div>
@@ -130,7 +130,7 @@ const bgAudio = document.getElementById("bgAudio");
 
 let started = false;
 let reached = false;
-let audioStarted = false;
+let endAudioStarted = false;
 
 // fullscreen kilépés többféle böngészőre
 function exitAnyFullscreen() {
@@ -167,9 +167,9 @@ function showContinue() {
   }, 250);
 }
 
-async function startAudioOnce() {
-  if (audioStarted) return;
-  audioStarted = true;
+async function startEndAudioOnce() {
+  if (endAudioStarted) return;
+  endAudioStarted = true;
 
   try {
     bgAudio.currentTime = 0;
@@ -180,9 +180,7 @@ async function startAudioOnce() {
 }
 
 // VIDEÓ INDÍTÁS
-video.addEventListener("play", async () => {
-  await startAudioOnce();
-
+video.addEventListener("play", () => {
   if (!started) {
     track("video_start_01");
     started = true;
@@ -190,18 +188,33 @@ video.addEventListener("play", async () => {
 });
 
 // ELÉRTE A 2:26-OT (146 mp)
-video.addEventListener("timeupdate", () => {
+video.addEventListener("timeupdate", async () => {
   if (!reached && video.currentTime >= 146) {
     reached = true;
     track("video_reach_01");
 
-    // kilép fullscreenből
     exitAnyFullscreen();
 
-    // megállítjuk a videót, de a hang megy tovább
-    setTimeout(() => {
+    setTimeout(async () => {
       video.pause();
       showContinue();
+      await startEndAudioOnce();
+    }, 300);
+  }
+});
+
+// ha bele teker és egyből ide ugrik
+video.addEventListener("seeked", async () => {
+  if (!reached && video.currentTime >= 146) {
+    reached = true;
+    track("video_reach_01");
+
+    exitAnyFullscreen();
+
+    setTimeout(async () => {
+      video.pause();
+      showContinue();
+      await startEndAudioOnce();
     }, 300);
   }
 });
