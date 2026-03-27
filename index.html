@@ -36,18 +36,6 @@ body {
   width: 100%;
   background: black;
 }
-#posterOverlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  top: 0;
-  left: 0;
-  z-index: 5;
-
-  transition: opacity 1.5s ease;
-  pointer-events: none;
-}
 
 video {
   width: 100%;
@@ -146,19 +134,10 @@ async function track(event){
 track("video_page_01");
 
 const video = document.getElementById("mainVideo");
-const poster = document.getElementById("posterOverlay");
 const btn = document.getElementById("continueBtn");
 const bgAudio = document.getElementById("bgAudio");
 
-  video.addEventListener("play", () => {
-  if (!poster) return;
-
-  poster.style.opacity = "0";
-
-  setTimeout(() => {
-    poster.style.display = "none";
-  }, 1500);
-});
+ 
 
 let started = false;
 let reached = false;
