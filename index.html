@@ -90,7 +90,7 @@ video {
       webkit-playsinline
       preload="metadata"
     >
-     <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774611443/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774611443/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
     </video>
 
   </div>
@@ -179,6 +179,13 @@ async function startEndAudioOnce() {
   }
 }
 
+function stopEndAudio() {
+  try {
+    bgAudio.pause();
+    bgAudio.currentTime = 0;
+  } catch(e) {}
+}
+
 // VIDEÓ INDÍTÁS
 video.addEventListener("play", () => {
   if (!started) {
@@ -228,15 +235,20 @@ document.addEventListener("webkitfullscreenchange", () => {
   if (reached) showContinue();
 });
 
+// hang leállítása kilépésnél / lapváltásnál
+window.addEventListener("pagehide", stopEndAudio);
+window.addEventListener("beforeunload", stopEndAudio);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    stopEndAudio();
+  }
+});
+
 // TOVÁBB GOMB
 btn.addEventListener("click", () => {
   track("continue_01");
-
-  try {
-    bgAudio.pause();
-    bgAudio.currentTime = 0;
-  } catch(e) {}
-
+  stopEndAudio();
   window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
 });
 </script>
