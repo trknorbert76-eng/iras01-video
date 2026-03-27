@@ -90,13 +90,17 @@ video {
       webkit-playsinline
       preload="metadata"
     >
-      <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774557619/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/dgcumjeuj/video/upload/v1774609678/T%C3%B6r%C3%B6k_Norbert_Az_%C3%ADr%C3%A1s_01_rlkfnc.mp4" type="video/mp4">
     </video>
 
   </div>
 </div>
 
 <button id="continueBtn">Folytatás</button>
+
+<audio id="bgAudio" preload="auto">
+  <source src="vershang.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 const SUPABASE_URL = "https://hhysuxfwdjwlxtmlxnrv.supabase.co";
@@ -122,9 +126,11 @@ track("video_page_01");
 
 const video = document.getElementById("mainVideo");
 const btn = document.getElementById("continueBtn");
+const bgAudio = document.getElementById("bgAudio");
 
 let started = false;
 let reached = false;
+let audioStarted = false;
 
 // fullscreen kilépés többféle böngészőre
 function exitAnyFullscreen() {
@@ -156,14 +162,27 @@ function exitAnyFullscreen() {
 function showContinue() {
   btn.style.display = "block";
 
-  // kis késleltetés után odagörget, hogy biztos látható legyen
   setTimeout(() => {
     btn.scrollIntoView({ behavior: "smooth", block: "center" });
   }, 250);
 }
 
+async function startAudioOnce() {
+  if (audioStarted) return;
+  audioStarted = true;
+
+  try {
+    bgAudio.currentTime = 0;
+    await bgAudio.play();
+  } catch (e) {
+    console.log("Audio play hiba:", e);
+  }
+}
+
 // VIDEÓ INDÍTÁS
-video.addEventListener("play", () => {
+video.addEventListener("play", async () => {
+  await startAudioOnce();
+
   if (!started) {
     track("video_start_01");
     started = true;
@@ -179,7 +198,7 @@ video.addEventListener("timeupdate", () => {
     // kilép fullscreenből
     exitAnyFullscreen();
 
-    // megállítjuk a videót, hogy a néző biztos észrevegye a folytatást
+    // megállítjuk a videót, de a hang megy tovább
     setTimeout(() => {
       video.pause();
       showContinue();
@@ -199,6 +218,12 @@ document.addEventListener("webkitfullscreenchange", () => {
 // TOVÁBB GOMB
 btn.addEventListener("click", () => {
   track("continue_01");
+
+  try {
+    bgAudio.pause();
+    bgAudio.currentTime = 0;
+  } catch(e) {}
+
   window.location.href = "https://trknorbert76-eng.github.io/iras-01/";
 });
 </script>
